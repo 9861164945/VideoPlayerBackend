@@ -7,7 +7,7 @@ import dotenv from 'dotenv'; // For loading environment variables from the .env 
 dotenv.config({
     path: './.env' // Providing path ./env means the .env file is available in the home/root directory
 });
-
+express();
 // Function to validate essential environment variables it helps cheks the .env file is avaliable or not
 const validateEnv = () => {
     if (!process.env.MONGO_URI) throw new Error('MONGO_URI is missing in .env'); // Check if MONGO_URI is defined
