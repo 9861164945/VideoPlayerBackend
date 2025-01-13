@@ -14,3 +14,4 @@ app.use(express.static("public")); // Serve static files from the 'public' folde
 app.use(cookieParser()); // Parse cookies and make them understandable to the server
 
 export { app }; // New ES module syntax for exporting the Express app
+//7hr 32min 

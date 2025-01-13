@@ -4,27 +4,27 @@ const videoSchema=mongoose.Schema(
     {
 videoFile:{
     type:String,//cloudnary url
-    required:true,
+    required:[true,"Video File Needed"],
 
 },
 thumbnail:{
     type:String,//cloudnary url
-    required:true,
+    required:[true,"Thumbnail is required"],
     
 },
 title:{
     type:String,
-    required:true,
+    required:[true,"Title is required"],
     
 },
 description:{
     type:String,
-    required:true,
+    required:[true,"Descrption is required"],
     
 },
 duration:{
     type:Number,
-    required:true,
+    required:[true,"Duration is required"],
     
 },
   
@@ -37,7 +37,7 @@ isPublished:{
     default:true,
 },
 videoUploader:{
-    type:mongoose.Schema.Types.ObjectId,
+    type:mongoose.Schema.Types.ObjectId,//reference from user
     ref:"User"
 }
     }

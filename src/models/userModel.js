@@ -3,30 +3,34 @@ import jwt from "jsonwebtoken";
 import bcrypt from 'bcrypt';
 const userSchema=mongoose.Schema(
     {
-        username:{
+        username:
+        {
             type:String,
-            required:true,
+            required:[true,"username is required"],
             unique:true,
             lowercase:true,
             trim:true,
-            index:true//makes user Searchable while db searching
+            index:true//makes user Searchable while db searching ordering user like  array index
         },
-        email:{
+        email:
+        {
             type:String,
-            required:true,
+            required:[true,"user email is a required field"],
             unique:true,
             lowercase:true,
             trim:true,
            },
         
-           fullname:{
+           fullname: 
+           {
             type:String,
-            required:true,
+            required:[true,"full name is required"],
             trim:true,
             index:true
            },
            
-           avatar:{
+           avatar:
+           {
             type:String,//Cloudnary services
             required:true,
            
@@ -36,12 +40,13 @@ const userSchema=mongoose.Schema(
            },
            watchHistory:[
           {
-            type:mongoose.Schema.Types.ObjectId,
+            type:mongoose.Schema.Types.ObjectId,//Reference From Video db
             ref:"Video"
 
            }
         ],
-        password:{
+        password: 
+        {
             type:String,
             required:[true,"password id required"]
         },
@@ -51,16 +56,17 @@ const userSchema=mongoose.Schema(
             
     }
     ,{timestamps:true});
-    userSchema.pre("Save", async function(next)
+    userSchema.pre("Save", async function(next)//.pre means before storing data in database
     {
         if(!this.isModified("password")) return next();
-         this.password=bcrypt.hash(this,password,10);
+         this.password=bcrypt.hash(this,password,10);//password length  must be 10 
          next();
     });
     userSchema.methods.isPasswordCorrect=async function
     (password){
-       return await bcrypt.compare(password,this.password);
+       return await bcrypt.compare(password,this.password);// bcrypt.compare () means which password is  pass by the function parameter that compare with  the password which is avaliable in the database
     };
+    //Access Token
     userSchema.methods.generateAccessToken=function(){
         return jwt.sign(
             {//payload:dbname
@@ -70,11 +76,12 @@ const userSchema=mongoose.Schema(
                 fullname:this.fullname
 
             },
-            process.env.ACCESS_TOKEN_SECRET,
+            process.env.ACCESS_TOKEN_SECRET,//Acess token which is avaliable inside .env
             {
-                expiresIn:process.env.ACCESS_TOKEN_EXPIRY
+                expiresIn:process.env.ACCESS_TOKEN_EXPIRY//access token is expired in this days after the end of the expiry days a new awt token generated
             });
     };
+    //Refresh Token
     userSchema.methods.generateRefreshToken=function(){
         return jwt.sign(
             {//payload:dbname
