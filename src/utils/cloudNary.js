@@ -5,7 +5,7 @@ cloudinary.config({
     api_key:process.env.CLOUD_API_KEY,
     api_secret:process.env.CLOUD_API_SECRET
 });
-const uploadcloudinary=async (localfilepath)=>
+const uploadOnCloudinary=async (localfilepath)=>
     {
 try 
 {
@@ -24,3 +24,4 @@ catch (error)
 }
 
 };
+export {uploadOnCloudinary};

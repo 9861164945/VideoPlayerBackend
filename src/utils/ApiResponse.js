@@ -8,3 +8,4 @@ class ApiResponse
     this.success=statusCode<400;//here we pass our status code it is less than 400 then it will success;
 }
 }
+export {ApiResponse};

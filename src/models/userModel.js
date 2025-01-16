@@ -59,7 +59,7 @@ const userSchema=mongoose.Schema(
     userSchema.pre("Save", async function(next)//.pre means before storing data in database
     {
         if(!this.isModified("password")) return next();
-         this.password=bcrypt.hash(this,password,10);//password length  must be 10 
+         this.password=await bcrypt.hash(this,password,10);//password length  must be 10 
          next();
     });
     userSchema.methods.isPasswordCorrect=async function
