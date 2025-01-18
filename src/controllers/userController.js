@@ -8,6 +8,12 @@ const registerUser=asyncHandler(async(req,res)=>{
 //Get userDetails from frontend
 const {username,password,email,fullname}=req.body;
 console.log("username",username);
+console.log("password",password);
+console.log("email",email);
+console.log("fullname",fullname);
+
+
+
 //Validation-- check  Empty or not
 // if(fullname==="")
 // {
@@ -23,15 +29,20 @@ if(
 throw new ApiError(400,"All fileds Are required!");
  }
 //check if user already exists by their  username,email
-const existingUser=User.findOne({
+const existingUser=await User.findOne({
     $or:[{username},{email}]
 });
 if(existingUser){
-    throw new ApiError(409,"User With Email and username Already exists u can create a duplicate user ");
+    throw new ApiError(409,"User With Email and username Already exists u can not create a duplicate user ");
 }
+console.log("Uploaded files: " + JSON.stringify(req.files));  // This will convert it to a string representation
 //check  for images ,check for avatar 
 const avatarLocalpath=req.files?.avatar[0]?.path;
-const coverImageLocation=req.files?.coverImage[0]?.path;
+//const coverImageLocation=req.files?.coverImage[0]?.path;
+let coverImageLocalPath = [];
+if (req.files && Array.isArray(req.files.coverImage)) {
+    coverImageLocalPath = req.files.coverImage.map((file) => file.path);
+  }
 if(!avatarLocalpath){
     throw new ApiError(400,"avatar is required ");
 
@@ -39,18 +50,34 @@ if(!avatarLocalpath){
 //upload them to cloudnary,check avatar is uploaded or not;
 
 const avatar=await uploadOnCloudinary(avatarLocalpath);
-const coverImage=await uploadOnCloudinary(coverImageLocation);
-if(!avatar){
-    throw new ApiError(400,"Avatar filed required");
+const coverImage = await Promise.all(
+    coverImageLocalPath.map(path => uploadOnCloudinary(path))
+  );
+
+console.log("Ac",avatar);
+console.log('ci',coverImage);
+if(!avatar||!avatar.url){
+    throw new ApiError(400,"Avatar file is  required");
+}
+
+// Handle multiple cover images if uploaded
+const coverImageUrls = [];
+if (coverImageLocalPath.length > 0) {
+  for (let path of coverImageLocalPath) {
+    const coverImage = await uploadOnCloudinary(path);
+    if (coverImage && coverImage.url) {
+      coverImageUrls.push(coverImage.url);
+    }
+  }
 }
 //create user object--create entry in db:
 const user=await User.create({
-    fullname:fullname.toLowercase,
+    fullname:fullname.toLowerCase(),
     avatar:avatar.url,
-    coverImage:coverImage?.url || "" ,
+    coverImage:coverImageUrls.join(", ")|| "" ,//JoinMultiople CoverImage
     email,
     password,
-    username:username.toLowercase()
+    username:username.toLowerCase()
 
 });
 //check for userCreation and remove password and refresh token field from response
