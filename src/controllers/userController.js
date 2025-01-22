@@ -183,7 +183,7 @@ await User.findByIdAndUpdate(req.user._id,
 });
 const refreshAccessToken=asyncHandler(async(req,res)=>{
     const incomingToken= req.cookies.refreshToken||req.body.refreshToken;
-    if(incomingToken)
+    if(!incomingToken)
     {
 
         throw new ApiError(401,"Unauthorized Request");//If token is not valid
